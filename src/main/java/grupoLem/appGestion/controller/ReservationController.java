@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,36 @@ public class ReservationController {
         Map<String, Boolean> response = new HashMap<>();
         response.put("Eliminado", Boolean.TRUE);
         return ResponseEntity.ok(response);
+    }
+
+    // Encontrar reserva por fecha de inicio
+    @GetMapping("/comienzoReserva/{startDate}")
+    public List<Reservation> findByStartDate(@PathVariable LocalDate startDate) {
+        return reservationService.findByStartDate(startDate);
+    }
+
+    // Encontrar reserva por fecha de finalizacion
+    @GetMapping("/finalizaReserva/{endDate}")
+    public List<Reservation> findByEndDate(@PathVariable LocalDate endDate) {
+        return reservationService.findByEndDate(endDate);
+    }
+
+    // Encontrar reservas que incluya el desayuno
+    @GetMapping("/incluyeDesayuno/{includesBreakfast}")
+    public List<Reservation> findByIncludesBreakfast(@PathVariable boolean includesBreakfast) {
+        return reservationService.findByIncludesBreakfast(includesBreakfast);
+    }
+
+    // Encontrar reservas que sean media pension
+    @GetMapping("/mediaPension/{includesHalfPension}")
+    public List<Reservation> findByIncludesHalfPension(@PathVariable boolean includesHalfPension) {
+        return reservationService.findByIncludesHalfPension(includesHalfPension);
+    }
+
+    // Encontrar reservas que sea pension completa
+    @GetMapping("/pensionCompleta/{includesFullPension}")
+    public List<Reservation> findByIncludesFullPension(@PathVariable boolean includesFullPension) {
+        return reservationService.findByIncludesFullPension(includesFullPension);
     }
 }
 

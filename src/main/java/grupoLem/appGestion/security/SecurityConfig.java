@@ -49,6 +49,21 @@ public class SecurityConfig {
                     auth.requestMatchers("/login","/createUser","/")
                         .permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/login","/createClient").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/Huespedes","/huesped/{id}","/reservas",
+                            "/buscarReserva/{id}","/habitaciones","/buscarHabitacion/{id}",
+                                    "/comienzoReserva/{startDate}","/finalizaReserva/{endDate}",
+                                    "/incluyeDesayuno/{includesBreakfast}","/mediaPension/{includesHalfPension}",
+                                    "/pensionCompleta/{includesFullPension}")
+                            .hasAnyRole("ADMIN","EMPLOYEE");
+                    auth.requestMatchers(HttpMethod.POST, "/crearHuesped", "/nuevaReserva",
+                                    "/NuevaHabitacion")
+                            .hasAnyRole("ADMIN","EMPLOYEE");
+                    auth.requestMatchers(HttpMethod.PUT, "/actualizarHuesped/{id}","/editarReserva/{id}",
+                                    "/editarHabitacion/{id}")
+                            .hasAnyRole("ADMIN","EMPLOYEE");
+                    auth.requestMatchers(HttpMethod.DELETE, "/eliminarHuesped/{id}","/eliminarReserva/{id}",
+                                    "/eliminarHabitacion/{id}")
+                            .hasRole("ADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session ->{
