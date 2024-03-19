@@ -42,8 +42,12 @@ public class Reservation {
     private String typePension;
 
     @ManyToOne
-    @JoinColumn(name = "id_host") // Nombre de la columna que servirá como clave foránea en la tabla de reservas
+    @JoinColumn(name = "host_id")
     private Host host;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
 
     public void setTypePension(String pensionType) {
         switch (pensionType) {

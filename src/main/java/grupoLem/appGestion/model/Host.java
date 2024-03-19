@@ -28,6 +28,6 @@ public class Host {
     private String notes;
     private Integer numberOfCompanions;
 
-    @OneToMany(mappedBy = "host")
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 }
