@@ -3,8 +3,10 @@ package grupoLem.appGestion.controller;
 
 import grupoLem.appGestion.exception.ResourceNotFoundException;
 import grupoLem.appGestion.model.Reservation;
+import grupoLem.appGestion.model.Room;
 import grupoLem.appGestion.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +37,7 @@ public class ReservationController {
     }
 
     //Buscar Reserva por ID
-    @GetMapping("/buscarReserva/{id}")
+    @GetMapping("/buscarReserva/{idReservations}")
     public ResponseEntity<Reservation> searchReservationById(@PathVariable Integer idReservation){
         Reservation reservation = this.reservationService.findById(idReservation);
         if (reservation != null) {
@@ -46,7 +48,7 @@ public class ReservationController {
     }
 
     //Editar una reserva
-    @PutMapping("/editarReserva/{id}")
+    @PutMapping("/editarReserva/{idReservations}")
     public ResponseEntity<Reservation> updateReservations(@PathVariable Integer idReservation,
                                                            @RequestBody Reservation reservationsReceived){
         Reservation reservation = this.reservationService.findById(idReservation);
@@ -68,7 +70,7 @@ public class ReservationController {
     }
 
     //Eliminar una reserva
-    @DeleteMapping("/eliminarReserva/{id}")
+    @DeleteMapping("/eliminarReserva/{idReservations}")
     public ResponseEntity<Map<String, Boolean>> deleteReservation(@PathVariable Integer idReservation){
         Reservation reservation = this.reservationService.findById(idReservation);
         if (reservation == null)
@@ -107,6 +109,12 @@ public class ReservationController {
     @GetMapping("/pensionCompleta/{includesFullPension}")
     public List<Reservation> findByIncludesFullPension(@PathVariable boolean includesFullPension) {
         return reservationService.findByIncludesFullPension(includesFullPension);
+    }
+
+    @GetMapping("/habitacionesDisponibles")
+    public List<Room> findAvailableRooms(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return reservationService.findAvailableRooms(startDate, endDate);
     }
 }
 

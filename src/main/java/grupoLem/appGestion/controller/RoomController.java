@@ -34,7 +34,7 @@ public class RoomController {
     }
 
     //Busccar habitacion por ID
-    @GetMapping("/buscarHabitacion/{id}")
+    @GetMapping("/buscarHabitacion/{idRoom}")
     public ResponseEntity<Room> findById(@PathVariable Integer idRoom) {
         Room room = roomService.findById(idRoom);
         if (room != null) {
@@ -45,7 +45,7 @@ public class RoomController {
     }
 
     //Actualizar una habitacion, cambiar estado,etc
-    @PutMapping("/editarHabitacion/{id}")
+    @PutMapping("/editarHabitacion/{idRoom}")
     public ResponseEntity<Room> updateRoom(@PathVariable Integer idRoom,
                                            @RequestBody Room roomReceived){
         Room room = this.roomService.findById(idRoom);
@@ -60,7 +60,7 @@ public class RoomController {
     }
 
     //Eliminar una habitacion:
-    @DeleteMapping("/eliminarHabitacion/{id}")
+    @DeleteMapping("/eliminarHabitacion/{idRoom}")
     public ResponseEntity<Map<String, Boolean>> deleteById(@PathVariable Integer idRoom){
         Room room = this.roomService.findById(idRoom);
         if (room == null)

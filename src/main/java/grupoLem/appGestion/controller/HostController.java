@@ -37,7 +37,7 @@ import java.util.Map;
 
 
         //Buscar huesped por ID
-        @GetMapping("/huesped/{id}")
+        @GetMapping("/huesped/{idHost}")
         public ResponseEntity<Host> findHostById(@PathVariable Integer idHost) {
             Host host = this.hostService.findById(idHost);
             if (host != null) {
@@ -47,7 +47,7 @@ import java.util.Map;
             }
         }
 
-        @PutMapping("/actualizarHuesped/{id}")
+        @PutMapping("/actualizarHuesped/{idHost}")
         public ResponseEntity<Host> updateHost(@PathVariable Integer idHost,
                                                @RequestBody Host hostReceived){
             Host host = this.hostService.findById(idHost);
@@ -66,7 +66,7 @@ import java.util.Map;
         }
 
         //Eliminar un huesped de la base de Datos
-        @DeleteMapping("/eliminarHuesped/{id}")
+        @DeleteMapping("/eliminarHuesped/{idHost}")
         public ResponseEntity<Map<String, Boolean>> deleteHost(@PathVariable Integer idHost){
             Host host = this.hostService.findById(idHost);
             if (host == null)

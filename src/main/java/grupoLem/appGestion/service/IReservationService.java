@@ -2,6 +2,7 @@
 package grupoLem.appGestion.service;
 
 import grupoLem.appGestion.model.Reservation;
+import grupoLem.appGestion.model.Room;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,5 +29,7 @@ public interface IReservationService {
     List<Reservation> findByIncludesFullPension(boolean includesFullPension);
 
     Reservation createNewReservation(String pensionType, LocalDate checkInDate, LocalTime checkInTime, LocalDate checkOutDate, LocalTime checkOutTime);
+
+    public List<Room> findAvailableRooms(LocalDate startDate, LocalDate endDate);
 }
 

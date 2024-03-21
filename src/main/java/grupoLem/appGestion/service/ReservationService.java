@@ -2,12 +2,15 @@
 package grupoLem.appGestion.service;
 
 import grupoLem.appGestion.model.Reservation;
+import grupoLem.appGestion.model.Room;
 import grupoLem.appGestion.repository.ReservationRepository;
+import grupoLem.appGestion.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,6 +19,9 @@ public class ReservationService implements IReservationService{
 
     @Autowired
     private ReservationRepository reservationsRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
 
     @Override
     public List<Reservation> getAllReservations() {
@@ -85,5 +91,20 @@ public class ReservationService implements IReservationService{
         reservation.setCheckOutDate(checkOutDate);
         reservation.setCheckOutTime(checkOutTime);
         return reservationsRepository.save(reservation);
+    }
+
+    @Override
+    public List<Room> findAvailableRooms(LocalDate startDate, LocalDate endDate) {
+
+        List<Reservation> overlappingReservations = reservationsRepository.findOverlappingReservations(startDate, endDate);
+
+        List<Room> allRooms = roomRepository.findAll();
+
+        List<Room> availableRooms = new ArrayList<>(allRooms);
+        for (Reservation reservation : overlappingReservations) {
+            availableRooms.remove(reservation.getRoom());
+        }
+
+        return availableRooms;
     }
 }

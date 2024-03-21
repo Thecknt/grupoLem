@@ -49,20 +49,20 @@ public class SecurityConfig {
                     auth.requestMatchers("/login","/createUser","/")
                         .permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/login","/createClient").permitAll();
-                    auth.requestMatchers(HttpMethod.GET, "/Huespedes","/huesped/{id}","/reservas",
-                            "/buscarReserva/{id}","/habitaciones","/buscarHabitacion/{id}",
+                    auth.requestMatchers(HttpMethod.GET, "/Huespedes","/huesped/{idHost}","/reservas",
+                            "/buscarReserva/{idReservations}","/habitaciones","/buscarHabitacion/{idRoom}",
                                     "/comienzoReserva/{startDate}","/finalizaReserva/{endDate}",
                                     "/incluyeDesayuno/{includesBreakfast}","/mediaPension/{includesHalfPension}",
-                                    "/pensionCompleta/{includesFullPension}")
+                                    "/pensionCompleta/{includesFullPension}","/habitacionesDisponibles")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.POST, "/crearHuesped", "/nuevaReserva",
                                     "/NuevaHabitacion")
                             .hasAnyRole("ADMIN","EMPLOYEE");
-                    auth.requestMatchers(HttpMethod.PUT, "/actualizarHuesped/{id}","/editarReserva/{id}",
-                                    "/editarHabitacion/{id}")
+                    auth.requestMatchers(HttpMethod.PUT, "/actualizarHuesped/{idHost}","/editarReserva/{idReservations}",
+                                    "/editarHabitacion/{idRoom}")
                             .hasAnyRole("ADMIN","EMPLOYEE");
-                    auth.requestMatchers(HttpMethod.DELETE, "/eliminarHuesped/{id}","/eliminarReserva/{id}",
-                                    "/eliminarHabitacion/{id}")
+                    auth.requestMatchers(HttpMethod.DELETE, "/eliminarHuesped/{idHost}","/eliminarReserva/{idReservations}",
+                                    "/eliminarHabitacion/{idRoom}")
                             .hasRole("ADMIN");
                     auth.anyRequest().authenticated();
                 })
