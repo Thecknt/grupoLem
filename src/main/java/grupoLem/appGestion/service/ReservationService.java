@@ -1,8 +1,10 @@
 
 package grupoLem.appGestion.service;
 
+import grupoLem.appGestion.exception.ResourceNotFoundException;
 import grupoLem.appGestion.model.Reservation;
 import grupoLem.appGestion.model.Room;
+import grupoLem.appGestion.model.RoomState;
 import grupoLem.appGestion.repository.ReservationRepository;
 import grupoLem.appGestion.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ReservationService implements IReservationService{
+public class ReservationService implements IReservationService {
 
 
     @Autowired
@@ -39,12 +41,23 @@ public class ReservationService implements IReservationService{
 
     @Override
     public Reservation save(Reservation reservations) {
-        return this.reservationsRepository.save(reservations);
+        Room room = reservations.getRoom();
+        List<Reservation> overlappingReservations = findOverlappingReservations(reservations.getStartDate(), reservations.getEndDate(), room);
+        if (!overlappingReservations.isEmpty()) {
+            throw new ResourceNotFoundException("There is already a reservation for this room during this period");
+        }
+        room.setRoomState(RoomState.OCUPADA);
+        reservations.setRoom(room);
+        reservationsRepository.save(reservations);
+        return reservations;
     }
 
     @Override
     public void deleteById(Integer idReservations) {
-        this.reservationsRepository.deleteById(idReservations);
+        Reservation reservation = findById(idReservations);
+        Room room = reservation.getRoom();
+        room.setRoomState(RoomState.LIBRE);
+        reservationsRepository.deleteById(idReservations);
     }
 
     @Override
@@ -62,25 +75,10 @@ public class ReservationService implements IReservationService{
     }
 
     @Override
-    public List<Reservation> findByIncludesBreakfast(boolean includesBreakfast) {
-        List<Reservation> breakfastList =
-                this.reservationsRepository.findByIncludesBreakfast(includesBreakfast);
-        return breakfastList;
+    public List<Reservation> findOverlappingReservations(LocalDate startDate, LocalDate endDate, Room room) {
+        return reservationsRepository.findOverlappingReservations(startDate, endDate, room);
     }
 
-    @Override
-    public List<Reservation> findByIncludesHalfPension(boolean includesHalfPension) {
-        List<Reservation> halfPensionList =
-                this.reservationsRepository.findByIncludesHalfPension(includesHalfPension);
-        return halfPensionList;
-    }
-
-    @Override
-    public List<Reservation> findByIncludesFullPension(boolean includesFullPension) {
-        List<Reservation> fullPensionList=
-                this.reservationsRepository.findByIncludesFullPension(includesFullPension);
-        return fullPensionList;
-    }
 
     @Override
     public Reservation createNewReservation(String pensionType, LocalDate checkInDate, LocalTime checkInTime, LocalDate checkOutDate, LocalTime checkOutTime) {
@@ -95,16 +93,30 @@ public class ReservationService implements IReservationService{
 
     @Override
     public List<Room> findAvailableRooms(LocalDate startDate, LocalDate endDate) {
+        return null;
+    }
 
-        List<Reservation> overlappingReservations = reservationsRepository.findOverlappingReservations(startDate, endDate);
-
-        List<Room> allRooms = roomRepository.findAll();
-
-        List<Room> availableRooms = new ArrayList<>(allRooms);
-        for (Reservation reservation : overlappingReservations) {
-            availableRooms.remove(reservation.getRoom());
+    @Override
+    public Reservation updateReservation(Integer idReservation, Reservation updatedReservation) {
+        Reservation existingReservation = findById(idReservation);
+        if (existingReservation == null) {
+            throw new ResourceNotFoundException("Reservation not found with ID: " + idReservation);
         }
-
-        return availableRooms;
+        Room existingRoom = existingReservation.getRoom();
+        List<Reservation> overlappingReservations = findOverlappingReservations(updatedReservation.getStartDate(), updatedReservation.getEndDate(), existingRoom);
+        if (!overlappingReservations.isEmpty()) {
+            throw new ResourceNotFoundException("There is already a reservation for this room during this period");
+        }
+        existingReservation.setStartDate(updatedReservation.getStartDate());
+        existingReservation.setEndDate(updatedReservation.getEndDate());
+        existingReservation.setHost(updatedReservation.getHost());
+        existingReservation.setTypePension(updatedReservation.getTypePension());
+        existingReservation.setCheckInDate(updatedReservation.getCheckInDate());
+        existingReservation.setCheckInTime(updatedReservation.getCheckInTime());
+        existingReservation.setCheckOutDate(updatedReservation.getCheckOutDate());
+        existingReservation.setCheckOutTime(updatedReservation.getCheckOutTime());
+        existingReservation.setEndDate(updatedReservation.getEndDate());
+        existingReservation.setStartDate(updatedReservation.getStartDate());
+        return reservationsRepository.save(existingReservation);
     }
 }

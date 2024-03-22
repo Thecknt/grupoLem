@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Service
-public class HostService implements IHostService{
+public class HostService implements IHostService {
 
     @Autowired
     private grupoLem.appGestion.repository.HostRepository HostRepository;

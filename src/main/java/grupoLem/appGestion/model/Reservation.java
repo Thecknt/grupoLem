@@ -18,9 +18,6 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idReservations;
-    private boolean includesBreakfast;
-    private boolean includesHalfPension;
-    private boolean includesFullPension;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
@@ -39,6 +36,8 @@ public class Reservation {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
+    @Column(name = "tipo_pension")
     private String typePension;
 
     @ManyToOne
@@ -48,29 +47,6 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
-
-    public void setTypePension(String pensionType) {
-        switch (pensionType) {
-            case "breakfast":
-                includesBreakfast = true;
-                includesHalfPension = false;
-                includesFullPension = false;
-                break;
-            case "halfPension":
-                includesBreakfast = false;
-                includesHalfPension = true;
-                includesFullPension = false;
-                break;
-            case "fullPension":
-                includesBreakfast = false;
-                includesHalfPension = false;
-                includesFullPension = true;
-                break;
-            default:
-                // Manejar caso no válido
-                break;
-        }
-    }
 
     public boolean isCheckOutTimePassed() {
         LocalDateTime now = LocalDateTime.now();

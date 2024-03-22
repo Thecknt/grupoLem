@@ -22,14 +22,12 @@ public interface IReservationService {
 
     List<Reservation> findByEndDate(LocalDate endDate);
 
-    List<Reservation> findByIncludesBreakfast(boolean includesBreakfast);
-
-    List<Reservation> findByIncludesHalfPension(boolean includesHalfPension);
-
-    List<Reservation> findByIncludesFullPension(boolean includesFullPension);
+    public List<Reservation> findOverlappingReservations(LocalDate startDate, LocalDate endDate, Room room);
 
     Reservation createNewReservation(String pensionType, LocalDate checkInDate, LocalTime checkInTime, LocalDate checkOutDate, LocalTime checkOutTime);
 
     public List<Room> findAvailableRooms(LocalDate startDate, LocalDate endDate);
+
+    public Reservation updateReservation(Integer idReservation, Reservation updatedReservation);
 }
 

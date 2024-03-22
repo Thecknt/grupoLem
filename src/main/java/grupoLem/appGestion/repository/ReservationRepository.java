@@ -2,6 +2,7 @@
 package grupoLem.appGestion.repository;
 
 import grupoLem.appGestion.model.Reservation;
+import grupoLem.appGestion.model.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,12 +17,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     List<Reservation> findByEndDate(LocalDate endDate);
 
-    List<Reservation> findByIncludesBreakfast(boolean includesBreakfast);
+    //public Reservation updateReservation(Integer idReservation, Reservation updatedReservation);
 
-    List<Reservation> findByIncludesHalfPension(boolean includesHalfPension);
-
-    List<Reservation> findByIncludesFullPension(boolean includesFullPension);
-
-    @Query("SELECT r FROM Reservation r WHERE (:startDate BETWEEN r.checkInDate AND r.checkOutDate) OR (:endDate BETWEEN r.checkInDate AND r.checkOutDate)")
-    List<Reservation> findOverlappingReservations(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("SELECT r FROM Reservation r WHERE (r.room = :room AND (:startDate BETWEEN r.checkInDate AND r.checkOutDate OR :endDate BETWEEN r.checkInDate AND r.checkOutDate))")
+    List<Reservation> findOverlappingReservations(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,@Param("room") Room room);
 }

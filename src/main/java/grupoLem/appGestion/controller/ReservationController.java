@@ -4,6 +4,8 @@ package grupoLem.appGestion.controller;
 import grupoLem.appGestion.exception.ResourceNotFoundException;
 import grupoLem.appGestion.model.Reservation;
 import grupoLem.appGestion.model.Room;
+import grupoLem.appGestion.model.RoomState;
+import grupoLem.appGestion.repository.RoomRepository;
 import grupoLem.appGestion.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,9 @@ public class ReservationController {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private RoomRepository roomRepository;
 
     //traer todas las reservas
     @GetMapping("/reservas")
@@ -62,9 +68,6 @@ public class ReservationController {
         reservation.setCheckOutTime(reservationsReceived.getCheckOutTime());
         reservation.setEndDate(reservationsReceived.getEndDate());
         reservation.setStartDate(reservationsReceived.getStartDate());
-        reservation.setIncludesBreakfast(reservationsReceived.isIncludesBreakfast());
-        reservation.setIncludesHalfPension(reservationsReceived.isIncludesHalfPension());
-        reservation.setIncludesFullPension(reservationsReceived.isIncludesFullPension());
         this.reservationService.save(reservation);
         return ResponseEntity.ok(reservation);
     }
@@ -93,28 +96,25 @@ public class ReservationController {
         return reservationService.findByEndDate(endDate);
     }
 
-    // Encontrar reservas que incluya el desayuno
-    @GetMapping("/incluyeDesayuno/{includesBreakfast}")
-    public List<Reservation> findByIncludesBreakfast(@PathVariable boolean includesBreakfast) {
-        return reservationService.findByIncludesBreakfast(includesBreakfast);
-    }
-
-    // Encontrar reservas que sean media pension
-    @GetMapping("/mediaPension/{includesHalfPension}")
-    public List<Reservation> findByIncludesHalfPension(@PathVariable boolean includesHalfPension) {
-        return reservationService.findByIncludesHalfPension(includesHalfPension);
-    }
-
-    // Encontrar reservas que sea pension completa
-    @GetMapping("/pensionCompleta/{includesFullPension}")
-    public List<Reservation> findByIncludesFullPension(@PathVariable boolean includesFullPension) {
-        return reservationService.findByIncludesFullPension(includesFullPension);
-    }
-
     @GetMapping("/habitacionesDisponibles")
     public List<Room> findAvailableRooms(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                          @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return reservationService.findAvailableRooms(startDate, endDate);
+        List<Reservation> overlappingReservations = reservationService.findOverlappingReservations(startDate, endDate, null);
+        List<Room> allRooms = roomRepository.findAll();
+
+        List<Room> availableRooms = new ArrayList<>(allRooms);
+        for (Reservation reservation : overlappingReservations) {
+            availableRooms.remove(reservation.getRoom());
+            reservation.getRoom().setRoomState(RoomState.OCUPADA);
+        }
+
+        return availableRooms;
     }
 }
 
+//List<Room> availableRooms = reservationService.findAvailableRooms(startDate, endDate);
+//        availableRooms.forEach(room -> {
+//        room.getReservations().stream()
+//                    .filter(reservation -> reservation.getStartDate().isBefore(endDate) && reservation.getEndDate().isAfter(startDate))
+//        .forEach(reservation -> room.setRoomState(RoomState.OCUPADA));
+//        });

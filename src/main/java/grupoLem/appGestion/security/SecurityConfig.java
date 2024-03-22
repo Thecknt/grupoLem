@@ -51,16 +51,17 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/login","/createClient").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/Huespedes","/huesped/{idHost}","/reservas",
                             "/buscarReserva/{idReservations}","/habitaciones","/buscarHabitacion/{idRoom}",
-                                    "/comienzoReserva/{startDate}","/finalizaReserva/{endDate}",
-                                    "/incluyeDesayuno/{includesBreakfast}","/mediaPension/{includesHalfPension}",
-                                    "/pensionCompleta/{includesFullPension}","/habitacionesDisponibles")
+                                    "/comienzoReserva/{startDate}","/finalizaReserva/{endDate}"
+                                    ,"/habitacionesDisponibles","/acompaniantes",
+                                    "/acompaniante/{idCompanion}")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.POST, "/crearHuesped", "/nuevaReserva",
-                                    "/NuevaHabitacion")
+                                    "/NuevaHabitacion","/crearAcompaniante")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.PUT, "/actualizarHuesped/{idHost}","/editarReserva/{idReservations}",
-                                    "/editarHabitacion/{idRoom}")
+                                    "/editarHabitacion/{idRoom}","/actualizarAcompaniante/{idCompanion}")
                             .hasAnyRole("ADMIN","EMPLOYEE");
+                    auth.requestMatchers(HttpMethod.DELETE, "/eliminarAcompaniante/{idCompanion}").hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.DELETE, "/eliminarHuesped/{idHost}","/eliminarReserva/{idReservations}",
                                     "/eliminarHabitacion/{idRoom}")
                             .hasRole("ADMIN");
