@@ -1,6 +1,7 @@
 
 package grupoLem.appGestion.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,5 +30,6 @@ public class Host {
     private Integer numberOfCompanions;
 
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Reservation> reservations = new ArrayList<>();
 }

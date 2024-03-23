@@ -2,14 +2,22 @@
 package grupoLem.appGestion.controller;
 
 import grupoLem.appGestion.exception.ResourceNotFoundException;
+import grupoLem.appGestion.model.Reservation;
 import grupoLem.appGestion.model.Room;
+import grupoLem.appGestion.model.RoomState;
+import grupoLem.appGestion.service.ReservationService;
 import grupoLem.appGestion.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -18,6 +26,9 @@ public class RoomController {
 
     @Autowired
     RoomService roomService;
+
+    @Autowired
+    ReservationService reservationService;
 
     //Mostrar todas las habitaciones
     @GetMapping("/habitaciones")
@@ -69,5 +80,24 @@ public class RoomController {
         Map<String, Boolean> response = new HashMap<>();
         response.put("Eliminado",Boolean.TRUE);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/habitacionesDisponibles")
+    public List<Room> findAvailableRooms(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<Room> allRooms = roomService.rooms();
+        List<Room> availableRooms = new ArrayList<>(allRooms);
+
+        for (Room room : allRooms) {
+            List<Reservation> overlappingReservations = room.getReservations().stream()
+                    .filter(reservation -> reservation.getStartDate().isBefore(endDate) && reservation.getEndDate().isAfter(startDate))
+                    .collect(Collectors.toList());
+
+            if (!overlappingReservations.isEmpty()) {
+                availableRooms.remove(room);
+            }
+        }
+
+        return availableRooms;
     }
 }

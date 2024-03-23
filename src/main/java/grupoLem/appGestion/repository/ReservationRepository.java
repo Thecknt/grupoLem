@@ -17,8 +17,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     List<Reservation> findByEndDate(LocalDate endDate);
 
-    //public Reservation updateReservation(Integer idReservation, Reservation updatedReservation);
-
-    @Query("SELECT r FROM Reservation r WHERE (r.room = :room AND (:startDate BETWEEN r.checkInDate AND r.checkOutDate OR :endDate BETWEEN r.checkInDate AND r.checkOutDate))")
-    List<Reservation> findOverlappingReservations(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,@Param("room") Room room);
+    @Query("""
+      select r
+      from Reservation r
+      where r.room.id = :roomId
+        and r.startDate <= :endDate
+        and r.endDate >= :startDate
+    """)
+    List<Reservation> findOverlappingReservations(@Param("roomId") Integer roomId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }
