@@ -2,6 +2,7 @@
 package grupoLem.appGestion.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,10 @@ public class Host {
     private String hostBirthDay;
     private String notes;
     private Integer numberOfCompanions;
+
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
+    @JsonProperty("companions")
+    private List<Companion> companions = new ArrayList<>();
 
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
     @JsonBackReference

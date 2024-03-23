@@ -1,6 +1,7 @@
 
 package grupoLem.appGestion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "acompaniantes")
 @ToString
 public class Companion {
     @Id
@@ -23,12 +25,8 @@ public class Companion {
     private String companionLastname;
     private String companionDni;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(idCompanion);
-    }
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "huesped_id")
+    @JsonIgnoreProperties("companions")
     private Host host;
 }

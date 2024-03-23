@@ -2,6 +2,7 @@
 package grupoLem.appGestion.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,7 +43,7 @@ public class Reservation {
     private String typePension;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonProperty("host")
     @JoinColumn(name = "host_id")
     private Host host;
 
