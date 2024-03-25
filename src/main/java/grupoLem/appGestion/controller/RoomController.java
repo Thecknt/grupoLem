@@ -5,6 +5,7 @@ import grupoLem.appGestion.exception.ResourceNotFoundException;
 import grupoLem.appGestion.model.Reservation;
 import grupoLem.appGestion.model.Room;
 import grupoLem.appGestion.model.RoomState;
+import grupoLem.appGestion.model.RoomStatePerDay;
 import grupoLem.appGestion.service.ReservationService;
 import grupoLem.appGestion.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -99,6 +97,40 @@ public class RoomController {
         }
 
         return availableRooms;
+    }
+
+
+    //traer todas las habitaciones por estado
+    @GetMapping("/habitaciones/estado")
+    public List<RoomStatePerDay> getRoomStatePerDay(@RequestParam Integer idRoom,
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<RoomStatePerDay> roomStatePerDayList = new ArrayList<>();
+        Room room = roomService.findById(idRoom);
+        if (room != null) {
+            LocalDate date = startDate;
+            while (!date.isAfter(endDate)) {
+                RoomState roomState = room.getRoomState();
+                LocalDate finalDate = date;
+                if (date.isBefore(room.getReservations().stream()
+                        .map(Reservation::getStartDate)
+                        .filter(startDateInRange -> !startDateInRange.isAfter(finalDate))
+                        .min((d1, d2) -> d1.compareTo(d2))
+                        .orElse(room.getReservations().isEmpty() ? endDate.plusDays(1) : room.getReservations().get(0).getStartDate()))) {
+                    roomState = RoomState.LIBRE;
+                }
+                if (date.isAfter(room.getReservations().stream()
+                        .map(Reservation::getEndDate)
+                        .filter(endDateInRange -> !endDateInRange.isBefore(finalDate))
+                        .max((d1, d2) -> d1.compareTo(d2))
+                        .orElse(room.getReservations().isEmpty() ? startDate.minusDays(1) : room.getReservations().get(0).getEndDate()))) {
+                    roomState = RoomState.OCUPADA;
+                }
+                roomStatePerDayList.add(new RoomStatePerDay(date, roomState));
+                date = date.plusDays(1);
+            }
+        }
+        return roomStatePerDayList;
     }
     
 }
