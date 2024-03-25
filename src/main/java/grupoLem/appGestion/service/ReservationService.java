@@ -31,6 +31,10 @@ public class ReservationService implements IReservationService {
         return allReservations;
     }
 
+    public Reservation getReservationById(Integer id) {
+        // Thisis just an example, replace this code with the relevant one
+        return reservationsRepository.findById(id).orElse(null);
+    }
     @Override
     public Reservation findById(Integer IdReservations) {
         Reservation reservations =

@@ -46,24 +46,24 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(config -> config.disable())
                 .authorizeHttpRequests(auth ->{
-                    auth.requestMatchers("/login","/createUser","/")
+                    auth.requestMatchers("/login","/createUser","/", "/error")
                         .permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/login","/createClient").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/Huespedes","/huesped/{idHost}","/reservas",
                             "/buscarReserva/{idReservations}","/habitaciones","/buscarHabitacion/{idRoom}",
                                     "/comienzoReserva/{startDate}","/finalizaReserva/{endDate}"
                                     ,"/habitacionesDisponibles","/acompaniantes",
-                                    "/acompaniante/{idCompanion}")
+                                    "/acompaniante/{idCompanion}","/mediosDePago", "medioDePago/{idMediaPayment}")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.POST, "/crearHuesped", "/nuevaReserva",
-                                    "/NuevaHabitacion","/crearAcompaniante")
+                                    "/NuevaHabitacion","/crearAcompaniante","medioDePagoReserva/{idReservation}")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.PUT, "/actualizarHuesped/{idHost}","/editarReserva/{idReservations}",
-                                    "/editarHabitacion/{idRoom}","/actualizarAcompaniante/{idCompanion}")
+                                    "/editarHabitacion/{idRoom}","/actualizarAcompaniante/{idCompanion}","editarMedioPago/{idMediaPayment}")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.DELETE, "/eliminarAcompaniante/{idCompanion}").hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.DELETE, "/eliminarHuesped/{idHost}","/eliminarReserva/{idReservations}",
-                                    "/eliminarHabitacion/{idRoom}")
+                                    "/eliminarHabitacion/{idRoom}","eliminarMedioPago/{idMediaPayment}")
                             .hasRole("ADMIN");
                     auth.anyRequest().authenticated();
                 })

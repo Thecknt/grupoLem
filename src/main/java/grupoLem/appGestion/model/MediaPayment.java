@@ -1,10 +1,7 @@
 
 package grupoLem.appGestion.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,63 +18,78 @@ public class MediaPayment {
     private double deposit = 0.0;
     private double creditCard = 0.0;
     private double extras = 0.0;
-    private double totalDelivered = 0.0;
+    private double totalDelivered  = 0.0;
     private double totalReservation = 0.0;
     private double remainingTotal = 0.0;
+    private double initialPayment= 0.0;
 
-    public void payment(double amount, String mediaPayment){
-        switch (mediaPayment) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
+    public MediaPayment(Reservation reservation){
+        this.reservation = reservation;
+        reservation.addMediaPayment(this);
+    }
+
+    public void payment(double amount, String mediaPaymentType){
+        switch (mediaPaymentType) {
             case "cash":
+                if (amount < 0){
+                    throw new IllegalArgumentException("El monto del pago en efectivo no puede ser negativo");
+                }
                 cash += amount;
                 break;
             case "deposit":
+                if (amount < 0) {
+                    throw new IllegalArgumentException("El monto del depósito no puede ser negativo");
+                }
                 deposit += amount;
                 break;
             case "creditCard":
+                if (amount < 0) {
+                    throw new IllegalArgumentException("El monto del pago con tarjeta de crédito no puede ser negativo");
+                }
                 creditCard += amount;
                 break;
             default:
-                break;
+                throw new IllegalArgumentException("Tipo de medio de pago no válido: " + mediaPaymentType);
         }
-
-        updateTotalDelivered();
-    }
-
-    public void updateExtras() {
-        extras += totalDelivered;
-    }
-
-    public void remainingAccount() {
-        remainingTotal = totalReservation - totalDelivered;
-    }
-
-
-    public void setTotalReservation(double totalReservation) {
-        if (totalReservation >= 0) {
-            this.totalReservation = totalReservation;
-            remainingAccount();
-        } else {
-            throw new IllegalArgumentException("El total de la reserva no puede ser negativo");
-        }
-    }
-
-    public void updateTotalDelivered() {
 
         totalDelivered = cash + deposit + creditCard;
-        remainingAccount();
+        updateRemainingTotal();
     }
 
-    public void addExtras(double amount) {
-        // Manejo de errores si el monto de los gastos es negativo
+    // Actualizar el pago inicial
+    public void updateInitialPayment(double amount) {
         if (amount < 0) {
-            throw new IllegalArgumentException("El monto de los gastos extras no puede ser negativo");
+            throw new IllegalArgumentException("El pago inicial no puede ser negativo");
         }
+        if (amount > totalReservation) {
+            throw new IllegalArgumentException("El pago inicial no puede ser mayor al total de la reserva");
+        }
+        this.initialPayment = amount;
+        updateRemainingTotal();
+    }
 
-        // Agregar gastos extras
-        extras += amount;
-        totalDelivered += amount;
-        // Calcular el saldo restante
-        remainingAccount();
+    // Actualizar los gastos extra
+    public void updateExtras() {
+        this.extras += totalDelivered;
+        updateRemainingTotal();
+    }
+
+    // Montos pendientes de pago
+    public void updateRemainingTotal() {
+        this.remainingTotal = this.totalReservation - this.totalDelivered - this.extras;
+    }
+
+    // Montos completos de la reserva
+    public void setTotalReservation(double totalReservation) {
+        if (totalReservation < 0) {
+            throw new IllegalArgumentException("El total de la reserva no puede ser negativo");
+        }
+        this.totalReservation = totalReservation;
+        this.remainingTotal = this.totalReservation - this.totalDelivered - this.extras;
     }
 }
 

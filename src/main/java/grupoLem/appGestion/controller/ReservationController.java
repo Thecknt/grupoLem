@@ -34,7 +34,6 @@ public class ReservationController {
     @GetMapping("/reservas")
     public List<Reservation> findAllReservations(){
         List<Reservation> reservationsList = this.reservationService.getAllReservations();
-        // Eliminar la información redundante de la habitación de cada reserva
         for (Reservation reservation : reservationsList) {
             Host host = reservation.getHost();
             reservation.setHost(host);
@@ -103,30 +102,4 @@ public class ReservationController {
         return reservationService.findByEndDate(endDate);
     }
 
-//    @GetMapping("/habitacionesDisponibles")
-//    public List<Room> findAvailableRooms(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-//                                         @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-//        List<Reservation> overlappingReservations = reservationService.findOverlappingReservations(startDate, endDate, null);
-//        List<Room> allRooms = roomRepository.findAll();
-//
-//        List<Room> availableRooms = new ArrayList<>(allRooms);
-//        List<Room> availableRoomsList = new ArrayList<>();
-//        for (Reservation reservation : overlappingReservations) {
-//            if (availableRooms.contains(reservation.getRoom())) {
-//                Room room = reservation.getRoom();
-//                room.setRoomState(RoomState.OCUPADA);
-//                roomRepository.save(room); // Actualiza el estado de la habitacion en la base de datos
-//                availableRoomsList.add(room);
-//            }
-//        }
-//
-//        return availableRoomsList;
-//    }
 }
-
-//List<Room> availableRooms = reservationService.findAvailableRooms(startDate, endDate);
-//        availableRooms.forEach(room -> {
-//        room.getReservations().stream()
-//                    .filter(reservation -> reservation.getStartDate().isBefore(endDate) && reservation.getEndDate().isAfter(startDate))
-//        .forEach(reservation -> room.setRoomState(RoomState.OCUPADA));
-//        });

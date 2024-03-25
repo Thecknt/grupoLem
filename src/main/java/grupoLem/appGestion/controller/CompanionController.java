@@ -5,6 +5,7 @@ import grupoLem.appGestion.exception.ResourceNotFoundException;
 import grupoLem.appGestion.model.Companion;
 import grupoLem.appGestion.model.Host;
 import grupoLem.appGestion.repository.CompanionRepository;
+import grupoLem.appGestion.repository.HostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,9 @@ public class CompanionController {
     @Autowired
     private CompanionRepository companionRepository;
 
+    @Autowired
+    HostRepository hostRepository;
+
     //Consultar todos los Acompañantes
     @GetMapping("/acompaniantes")
     public List<Companion> getAllHost() {
@@ -31,7 +35,17 @@ public class CompanionController {
     //Crear Acompañante
     @PostMapping("/crearAcompaniante")
     public Companion createCompanion(@RequestBody Companion companion) {
-        return this.companionRepository.save(companion);
+        Host host = hostRepository.findById(companion.getHost().getIdHost()).orElse(null);
+        companion.setHost(host);
+        Companion savedCompanion = this.companionRepository.save(companion);
+
+        Companion companionResponse = new Companion();
+        companionResponse.setIdCompanion(savedCompanion.getIdCompanion());
+        companionResponse.setCompanionName(savedCompanion.getCompanionName());
+        companionResponse.setCompanionLastname(savedCompanion.getCompanionLastname());
+        companionResponse.setCompanionDni(savedCompanion.getCompanionDni());
+
+        return companionResponse;
     }
 
     //Buscar acompañante por ID

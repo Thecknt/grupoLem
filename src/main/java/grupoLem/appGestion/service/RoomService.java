@@ -49,10 +49,10 @@ public class RoomService implements IRoomService{
     public List<Room> findAvailableRooms(Integer roomId,LocalDate startDate, LocalDate endDate) {
         List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(roomId,startDate,endDate);
         List<Room> allRooms = roomRepository.findAll();
-        List<Room> availableRooms = new ArrayList<>(allRooms); // To keep track of available rooms
+        List<Room> availableRooms = new ArrayList<>(allRooms);
 
         if (overlappingReservations.isEmpty()) {
-            return allRooms; // If no overlapping reservations, all rooms are available
+            return allRooms;
         }
 
         // Remove the rooms with overlapping reservations

@@ -29,17 +29,9 @@ import java.util.Map;
             return hosts;
         }
 
-        // Crear huésped
-//        @PostMapping("/crearHuesped")
-//        public ResponseEntity<Integer> createHost(@RequestBody Host host) {
-//            Host createdHost = hostService.save(host);
-//            return ResponseEntity.ok(createdHost.getIdHost());
-//        }
-
         //Crear huesped
         @PostMapping("/crearHuesped")
         public Host createHost(@RequestBody Host host) {
-
             return this.hostService.save(host);
         }
 
