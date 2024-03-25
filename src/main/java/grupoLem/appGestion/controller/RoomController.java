@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,31 +101,33 @@ public class RoomController {
     }
 
 
-    //traer todas las habitaciones por estado
-    @GetMapping("/habitaciones/estado")
+    //traer todas las habitaciones por estado y horario
+    @GetMapping("/habitaciones/estado-horario")
     public List<RoomStatePerDay> getRoomStatePerDay(@RequestParam Integer idRoom,
                                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
         List<RoomStatePerDay> roomStatePerDayList = new ArrayList<>();
         Room room = roomService.findById(idRoom);
         if (room != null) {
             LocalDate date = startDate;
             while (!date.isAfter(endDate)) {
-                RoomState roomState = room.getRoomState();
+                RoomState roomState = RoomState.LIBRE;
                 LocalDate finalDate = date;
-                if (date.isBefore(room.getReservations().stream()
-                        .map(Reservation::getStartDate)
-                        .filter(startDateInRange -> !startDateInRange.isAfter(finalDate))
-                        .min((d1, d2) -> d1.compareTo(d2))
-                        .orElse(room.getReservations().isEmpty() ? endDate.plusDays(1) : room.getReservations().get(0).getStartDate()))) {
-                    roomState = RoomState.LIBRE;
-                }
-                if (date.isAfter(room.getReservations().stream()
-                        .map(Reservation::getEndDate)
-                        .filter(endDateInRange -> !endDateInRange.isBefore(finalDate))
-                        .max((d1, d2) -> d1.compareTo(d2))
-                        .orElse(room.getReservations().isEmpty() ? startDate.minusDays(1) : room.getReservations().get(0).getEndDate()))) {
-                    roomState = RoomState.OCUPADA;
+                LocalTime finalStartTime = startTime;
+                LocalTime finalEndTime = endTime;
+                Optional<Reservation> reservationInRange = room.getReservations().stream()
+                        .filter(reservation -> !reservation.getStartDate().isAfter(finalDate) && !reservation.getEndDate().isBefore(finalDate))
+                        .findFirst();
+                if (reservationInRange.isPresent()) {
+                    Reservation reservation = reservationInRange.get();
+                    if (date.isEqual(reservation.getStartDate()) && finalStartTime.isBefore(reservation.getCheckInTime()) ||
+                            date.isEqual(reservation.getEndDate()) && finalEndTime.isAfter(reservation.getCheckOutTime())) {
+                        roomState = RoomState.LIBRE;
+                    } else {
+                        roomState = RoomState.OCUPADA;
+                    }
                 }
                 roomStatePerDayList.add(new RoomStatePerDay(date, roomState));
                 date = date.plusDays(1);

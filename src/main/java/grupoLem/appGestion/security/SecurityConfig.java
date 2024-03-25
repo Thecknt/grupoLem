@@ -54,7 +54,7 @@ public class SecurityConfig {
                                     "/comienzoReserva/{startDate}","/finalizaReserva/{endDate}"
                                     ,"/habitacionesDisponibles","/acompaniantes",
                                     "/acompaniante/{idCompanion}","/mediosDePago", "medioDePago/{idMediaPayment}",
-                                    "/habitaciones/estado")
+                                    "/habitaciones/estado-horario")
                             .hasAnyRole("ADMIN","EMPLOYEE");
                     auth.requestMatchers(HttpMethod.POST, "/crearHuesped", "/nuevaReserva",
                                     "/NuevaHabitacion","/crearAcompaniante","medioDePagoReserva/{idReservation}")
