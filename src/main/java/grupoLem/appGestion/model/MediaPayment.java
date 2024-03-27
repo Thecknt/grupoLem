@@ -32,6 +32,9 @@ public class MediaPayment {
         reservation.addMediaPayment(this);
     }
 
+    public MediaPayment(Reservation reservation, double totalReservation) {
+    }
+
     public void payment(double amount, String mediaPaymentType){
         switch (mediaPaymentType) {
             case "cash":

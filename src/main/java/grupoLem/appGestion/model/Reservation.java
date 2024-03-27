@@ -49,6 +49,9 @@ public class Reservation {
     @Column(name = "tipo_pension")
     private String typePension;
 
+    @Column(name = "monto_total")
+    private Double totalAmount = 0.0;
+
     @ManyToOne
     @JsonProperty("host")
     @JoinColumn(name = "host_id")

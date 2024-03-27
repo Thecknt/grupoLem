@@ -7,6 +7,7 @@ import grupoLem.appGestion.model.Reservation;
 import grupoLem.appGestion.service.MediaPaymentService;
 import grupoLem.appGestion.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,6 +90,49 @@ public class MediaPaymentController {
             throw new ResourceNotFoundException("El medio pago con el ID " + idMediaPayment + " no fue encontrado.");
         }
     }
+
+    //Controladores sobre la reserva "x"
+
+    //Creo un nuevo medio de pago para la reserva y actualizar el total
+    @PostMapping("/metodoDePago")
+    public ResponseEntity<Reservation> createNewReservationPaymentAndUpdateTotals(
+            @PathVariable Integer idReservation,
+            @RequestParam double totalReservation) {
+        Reservation reservation = reservationService.findById(idReservation);
+        reservationService.createNewPaymentReservationAndUpdateTotals(reservation, totalReservation);
+        return new ResponseEntity<>(reservation, HttpStatus.CREATED);
+    }
+
+    //Agrego gastos extras y los actualizo
+    @PostMapping("/agregarExtras")
+    public ResponseEntity<Reservation> addExtraExpenseToReservationPaymentAndUpdateTotals(
+            @PathVariable Integer idReservation,
+            @RequestParam double extraExpense){
+        Reservation reservation = reservationService.findById(idReservation);
+        reservationService.addExtraExpenseAndUpdateTotals(idReservation, extraExpense);
+        return new ResponseEntity<>(reservation, HttpStatus.OK);
+    }
+
+    //endPoint para obtener el restante de la deuda
+    @PostMapping("/restoAPagar")
+    public ResponseEntity<Double> getRestToPayForReservation(@PathVariable Integer idReservation){
+        Double remainingTotal = Double.valueOf(reservationService.getRestToPayForReservation(idReservation));
+        return new ResponseEntity<>(remainingTotal, HttpStatus.OK);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 

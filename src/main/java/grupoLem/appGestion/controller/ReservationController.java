@@ -2,10 +2,7 @@
 package grupoLem.appGestion.controller;
 
 import grupoLem.appGestion.exception.ResourceNotFoundException;
-import grupoLem.appGestion.model.Host;
-import grupoLem.appGestion.model.Reservation;
-import grupoLem.appGestion.model.Room;
-import grupoLem.appGestion.model.RoomState;
+import grupoLem.appGestion.model.*;
 import grupoLem.appGestion.repository.RoomRepository;
 import grupoLem.appGestion.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +41,9 @@ public class ReservationController {
 
     //Crear una reserva
     @PostMapping("/nuevaReserva")
-    public Reservation createReservation(@RequestBody Reservation reservations){
-        return this.reservationService.save(reservations);
+    public Reservation createReservation(@RequestBody Reservation reservation){
+        MediaPayment mediaPayment = new MediaPayment(reservation, reservation.getTotalAmount());
+        return this.reservationService.save(reservation);
     }
 
     //Buscar Reserva por ID
