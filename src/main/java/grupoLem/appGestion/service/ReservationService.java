@@ -2,9 +2,11 @@
 package grupoLem.appGestion.service;
 
 import grupoLem.appGestion.exception.ResourceNotFoundException;
+import grupoLem.appGestion.model.Host;
 import grupoLem.appGestion.model.Reservation;
 import grupoLem.appGestion.model.Room;
 import grupoLem.appGestion.model.RoomState;
+import grupoLem.appGestion.repository.HostRepository;
 import grupoLem.appGestion.repository.ReservationRepository;
 import grupoLem.appGestion.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class ReservationService implements IReservationService {
     @Autowired
     private RoomRepository roomRepository;
 
+    @Autowired
+    private HostRepository hostRepository;
+
     @Override
     public List<Reservation> getAllReservations() {
         List<Reservation> allReservations = this.reservationsRepository.findAll();
@@ -44,7 +49,20 @@ public class ReservationService implements IReservationService {
 
     @Override
     public Reservation save(Reservation reservations) {
-        return this.reservationsRepository.save(reservations);
+        //fijate sebas aca trago el id de la habitacion y lo busco en el repo asi me muestra la habitacion
+      Room room = roomRepository.findById(reservations.getRoom().getIdRoom()).orElse(null);
+      if (room != null) {
+          //Aca lo seteo a ocupada
+          room.setRoomState(RoomState.OCUPADA);
+          //ACa seteo la habitacion a la reserva
+          reservations.setRoom(room);
+          //y la guardo en la base de datos con el nuevo estado, sino siempre figura LIBRE
+          roomRepository.save(room);
+          return this.reservationsRepository.save(reservations);
+      }
+
+      //en caso de la que la habitacion sea nula te devuelvo este mensaje
+        throw new RuntimeException("habitacion no encontrada con el ID" + reservations.getRoom().getIdRoom());
     }
 
     @Override
